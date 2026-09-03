@@ -1,0 +1,376 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   FIELDNOTE CAPITAL — TOKEN LAYER
+   Single source of truth: docs/TOKENS.md
+   Every value below is locked. Do not inline raw values in components.
+   ========================================================================= */
+
+/* `static` forces every token to emit into :root even when no component uses it
+   yet. Required: the responsive overrides below are plain CSS and assume these
+   variables always exist. Without it, tree-shaking leaves e.g. --text-display
+   undefined below 768px but defined above it. */
+@theme static {
+  /* --- Color ------------------------------------------------------------ */
+  --color-page:          #F4F3F0;  /* bg-primary   — warm beige, page bg    */
+  --color-page-alt:      #FBFCFC;  /* bg-secondary — near-white alt band    */
+  --color-surface:       #FFFFFF;  /* cards, elevated panels                */
+  --color-ink:           #101214;  /* text-primary                          */
+  --color-ink-secondary: #485259;  /* text-secondary                        */
+  --color-ink-tertiary:  #949DA5;  /* text-tertiary                         */
+  --color-accent:        #090A0C;  /* primary action                        */
+  --color-accent-hover:  #101214;
+  --color-line:          #DDD6CE;  /* border                                */
+  --color-line-subtle:   #EDE8E2;  /* border-subtle / placeholder fill      */
+  --color-on-dark:       #EEF0F1;  /* text on dark bands                    */
+
+  /* WARM ACCENT — a deliberate change to the §2 contract, which reserved the
+   * oxblood for imagery and kept the UI achromatic. It now has a UI voice, on
+   * request, for points of emphasis.
+   *
+   * NOT --color-art-ink itself: #4B0F04 at chip size reads as black, not red.
+   * #8C2513 is the same hue carried up in lightness until it actually says red
+   * at 12px, and still measures 8.9:1 on white.
+   *
+   * RATIONED. Measured off amperos.com, colour was 7 uses against ~63 neutral
+   * ones in a whole panel. The rule taken from that: at most TWO warm marks per
+   * panel, and never on anything a neutral could carry. */
+  --color-accent-warm:      #8C2513;  /* warm accent: marks, values, states  */
+  --color-accent-warm-tint: #F6E8E4;  /* its ground, for chips and rows      */
+  /* The dark band (§8 CTA, §9 Footer) needs its own two values. --color-line
+   * #D2D5D7 on #090A0C is a glaring white wire, and --color-ink-secondary
+   * disappears into it — neither inverts usefully. Added when the footer
+   * landed; the CTA band uses the same pair. */
+  --color-on-dark-muted: #98A0A7;  /* secondary text on dark bands          */
+  --color-line-on-dark:  #262A2E;  /* hairline on dark bands                */
+  --color-error:         #A6503C;
+  --color-success:       #4A6B4F;
+
+  /* --- Art layer -------------------------------------------------------- *
+   * Sampled from the supplied dithered plates: a true 1-bit duotone, exactly
+   * two colours, no alpha. Namespaced `art-` on purpose — this is the ONLY
+   * chroma in the system and it belongs to imagery alone. Never use it for
+   * buttons, text, borders or state. The UI palette stays achromatic.        */
+  --color-art-ink:   #4B0F04;  /* oxblood — the dithered dots               */
+  --color-art-paper: #EDDADA;  /* pale pink — the plate ground              */
+
+  /* --- Type families ---------------------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* --- Type scale (mobile-first base; overridden per breakpoint below) ---
+     Every heading is weight 550. Every body tier is 450. Never 400 or 600. */
+  --text-display: 36px;
+  --text-display--line-height: 1.0;
+  --text-display--font-weight: 550;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-h1: 30px;
+  --text-h1--line-height: 1.1;
+  --text-h1--font-weight: 550;
+  --text-h1--letter-spacing: -0.03em;
+
+  --text-h2: 24px;
+  --text-h2--line-height: 1.2;
+  --text-h2--font-weight: 550;
+  --text-h2--letter-spacing: -0.03em;
+
+  --text-h3: 19px;
+  --text-h3--line-height: 1.3;
+  --text-h3--font-weight: 550;
+  --text-h3--letter-spacing: -0.025em;
+
+  --text-h4: 17px;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 550;
+  --text-h4--letter-spacing: -0.02em;
+
+  --text-body-lg: 17px;
+  --text-body-lg--line-height: 1.5;
+  --text-body-lg--font-weight: 450;
+  --text-body-lg--letter-spacing: 0em;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.4;
+  --text-body--font-weight: 450;
+  --text-body--letter-spacing: 0.0025em;
+
+  /* Chrome type — nav, utility bars. Deliberately NOT derived from --text-body
+     and deliberately constant across every breakpoint. Measured: Quartr's nav
+     is 16px/450 at both 800px and 1512px, inside a 56px bar. Navigation is
+     furniture; it should not grow with the content scale. */
+  --text-nav: 16px;
+  --text-nav--line-height: 1.4;
+  --text-nav--font-weight: 450;
+  --text-nav--letter-spacing: 0em;
+
+  /* Uppercase CONTENT label — column titles, sub-section headings. Fills the
+     gap between `eyebrow` (12px mono, metadata) and `h4` (18px sentence case).
+     Added because Thesis column titles were borrowing `text-nav` — a token
+     documented as chrome that must never carry content — plus an off-system
+     arbitrary tracking value. */
+  /* No longer uppercase — the caps came off with the sweep and only `eyebrow`
+   * kept them. 0.06em was tracking FOR caps; on sentence case it just pulls the
+   * word apart, so it goes to the same near-zero the other content tiers use. */
+  --text-label: 15px;
+  --text-label--line-height: 1.4;
+  --text-label--font-weight: 550;
+  --text-label--letter-spacing: 0.005em;
+
+  --text-small: 14px;
+  --text-small--line-height: 1.5;
+  --text-small--font-weight: 450;
+  --text-small--letter-spacing: 0em;
+
+  --text-eyebrow: 12px;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--font-weight: 500;
+  /* Was 0.12em on 32 labels across nine components. Wide-tracked all-caps mono
+   * is the single most recognisable generated-dashboard tell, and the tracking
+   * was the half doing the damage — the caps carry real hierarchy. 0.05em is
+   * what set caps need to stop colliding, and no more. */
+  --text-eyebrow--letter-spacing: 0.05em;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1.5;
+  --text-caption--font-weight: 450;
+  --text-caption--letter-spacing: 0em;
+
+  /* --- Radius (Option B — Quartr-exact) --------------------------------- */
+  --radius-xs:   3px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-full: 9999px;
+
+  /* --- Layout -----------------------------------------------------------
+   * NAMING TRAP: in Tailwind v4 the `--container-*` namespace generates width
+   * utilities (`w-*`, `max-w-*`, `min-w-*`). Naming this `--container-max`
+   * therefore REDEFINED the built-in `w-max` / `max-w-max` from `max-content`
+   * to 1280px, silently clamping anything that relied on it (it broke the
+   * marquee track). Keep these keys clear of Tailwind's width keywords:
+   * max, min, fit, full, auto, screen, px.                                  */
+  --container-page:    1280px;
+  --container-wide:    1328px;
+  --container-reading: 1024px;
+
+  /* --- Motion (Silent) --------------------------------------------------- */
+  --duration-instant:  120ms;
+  --duration-fast:     220ms;
+  --duration-normal:   340ms;
+  --duration-slow:     620ms;
+  --duration-dramatic: 900ms;
+
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-dramatic:   cubic-bezier(0.16, 1, 0.3, 1);
+
+  --stagger-tight:   60ms;
+  --stagger-normal:  90ms;
+  --stagger-relaxed: 140ms;
+}
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE TYPE TOKENS
+   Redefining the theme vars per breakpoint means `text-display` responds on its
+   own — no `md:text-*` variants scattered through components.
+   Breakpoints: 640 / 768 / 1024 / 1280
+   ------------------------------------------------------------------------ */
+@media (min-width: 768px) {
+  :root {
+    --text-display: 48px;
+    --text-display--letter-spacing: -0.04em;
+    --text-h1: 36px;
+    --text-h2: 28px;
+    --text-h3: 20px;
+    --text-h4: 17px;
+    --text-body-lg: 17px;
+    --text-body: 16px;
+  }
+}
+
+/* The scale CAPS here. There is deliberately no 1280+ step.
+   Measured: Quartr renders h1 at 68px on an 800px viewport AND on a 1512px
+   viewport — identical. It does not grow on wide screens, and that is precisely
+   why it reads clean and composed at full screen instead of shouty.
+   Do not add a wide-breakpoint scale-up. */
+@media (min-width: 1024px) {
+  :root {
+    --text-display: 68px;             /* Quartr h1 exact, hard cap        */
+    --text-display--line-height: 0.95;/* Quartr 64.6/68 exact             */
+    --text-display--letter-spacing: -0.05em;
+    --text-h1: 44px;
+    --text-h1--letter-spacing: -0.04em;
+    --text-h2: 32px;
+    --text-h2--letter-spacing: -0.04em;
+    --text-h3: 22px;
+    --text-h3--letter-spacing: -0.03em;
+    --text-h4: 18px;
+    --text-body-lg: 18px;
+    --text-body: 17px;                /* Quartr body exact                */
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   SECTION RHYTHM
+   Section padding Y: 80 / 112 / 160 / 192 · Padding X: 20 / 24 / 24 / 32
+   ------------------------------------------------------------------------ */
+@utility section {
+  padding-block: 80px;
+}
+@utility section-lg {
+  padding-block: 96px;
+}
+@utility section-sm {
+  padding-block: 56px;
+}
+/* max-width must track the gutter so the CONTENT column is always exactly
+   --container-max (1280px). Hardcoding one max-width silently narrows the
+   content by 2× the padding delta at wider breakpoints. */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: calc(var(--container-page) + 40px);
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .section    { padding-block: 112px; }
+  .section-lg { padding-block: 136px; }
+  .section-sm { padding-block: 72px; }
+  .container-page {
+    padding-inline: 24px;
+    max-width: calc(var(--container-page) + 48px);
+  }
+}
+@media (min-width: 1024px) {
+  .section    { padding-block: 160px; }
+  .section-lg { padding-block: 192px; }
+  .section-sm { padding-block: 96px; }
+}
+@media (min-width: 1280px) {
+  .container-page {
+    padding-inline: 32px;
+    max-width: calc(var(--container-page) + 64px);
+  }
+}
+
+/* Section padding is set in plain CSS media queries above, which sit AFTER
+   Tailwind's utility layer — so `pb-0` on a `.section` loses. These two-class
+   modifiers (0,2,0) outrank `.section` (0,1,0) at every breakpoint, which is
+   the fix rather than reaching for !important.
+   Use when a section's own children already supply the edge rhythm. */
+.section.section-flush-b,
+.section-lg.section-flush-b,
+.section-sm.section-flush-b {
+  padding-bottom: 0;
+}
+.section.section-flush-t,
+.section-lg.section-flush-t,
+.section-sm.section-flush-t {
+  padding-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   BASE
+   ------------------------------------------------------------------------ */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-weight: var(--text-body--font-weight);
+    /* Geist must load variable — 450/550 are not static cuts */
+    font-variation-settings: "wght" 450;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-page);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MARQUEE
+   Track is rendered twice; translating -50% lands exactly on the seam, so the
+   loop is invisible. Edge fade is a CSS alpha mask, not an overlay gradient —
+   an overlay would need a solid colour and would break over the art band.
+   ------------------------------------------------------------------------ */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@utility marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    to right, transparent, #000 96px, #000 calc(100% - 96px), transparent
+  );
+  mask-image: linear-gradient(
+    to right, transparent, #000 96px, #000 calc(100% - 96px), transparent
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   LENIS
+   Required companion CSS. Without the `scroll-behavior: auto` override the
+   native smooth-scroll rule set in `html` fights Lenis on anchor jumps and the
+   page stutters. Lenis only adds these classes when it initialises, so the
+   reduced-motion path (where it never starts) keeps native scrolling.
+   ------------------------------------------------------------------------ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+   FOLDER TAB OFFSET
+   Portfolio tabs step across the folder edge like real file tabs. The step is
+   a percentage of the column, so on narrow viewports the widest tab ran to
+   within 3px of the edge — passing, but one longer sector name from breaking.
+   Below sm the step is scaled down; the tab can also never exceed its own
+   track (`max-width:100%`), so overflow is structurally impossible.
+   ------------------------------------------------------------------------ */
+@utility folder-tab-track {
+  margin-left: var(--tab-offset, 0%);
+}
+@media (max-width: 639px) {
+  .folder-tab-track { margin-left: calc(var(--tab-offset, 0%) * 0.35); }
+}
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION — locked rule: reduce → instant, no transform
+   ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
