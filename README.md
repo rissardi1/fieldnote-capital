@@ -61,8 +61,19 @@ components/   one file per section, plus PanelKit (shared UI vocabulary)
 lib/plates.ts the plate manifest — src, alt, sampled paper and ink
 scripts/      asset build steps
 art-src/      masters that are NOT served; inputs to scripts/
-docs/         TOKENS.md
+docs/         TOKENS.md, RETROSPECTIVE.md, process/
 ```
+
+## Documentation
+
+- **[`docs/TOKENS.md`](docs/TOKENS.md)** — the locked token contract, plus a
+  running log of every decision, deviation and trap hit during the build. Read
+  the "Gotchas learned in build" section before changing anything global.
+- **[`docs/RETROSPECTIVE.md`](docs/RETROSPECTIVE.md)** — what worked, what did
+  not, and where the gaps are. Written at the end of the build, against the
+  process documents below.
+- **[`docs/process/`](docs/process/)** — the workflow this was built under: the
+  instruction contract, the original token-first workflow, and its revision.
 
 ## Accessibility
 
