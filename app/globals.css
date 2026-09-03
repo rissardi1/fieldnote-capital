@@ -282,6 +282,27 @@
     scroll-behavior: smooth;
   }
 
+  /* Height of the sticky header. One number, two consumers: this file's
+     scroll-margin below, and components/SmoothScroll.tsx — which reads the
+     header's live box rather than this token, so the two cannot drift. */
+  :root {
+    --nav-h: 64px;
+  }
+  @media (min-width: 1024px) {
+    :root {
+      --nav-h: 72px;
+    }
+  }
+
+  /* Without this, an anchor target scrolls to y=0 and the header parks itself
+     over the first 73px of it — measured on #faq, which landed at exactly 0.
+     SmoothScroll.tsx applies the same offset to the clicks it handles; this
+     rule covers the two paths that never reach it: a link opened directly at
+     /#faq, and prefers-reduced-motion, where Lenis never starts. */
+  section[id] {
+    scroll-margin-top: calc(var(--nav-h) + 12px);
+  }
+
   body {
     background-color: var(--color-page);
     color: var(--color-ink);

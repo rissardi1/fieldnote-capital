@@ -97,29 +97,30 @@ export default function Focus() {
     },
   });
 
-  /* No vertical rules in this section at all. They were tried twice: once
-     spanning the whole section, which carried them down alongside the bordered
-     card grid, and once as a ruled lead-in above the band. Both are out — the
-     header band's own top/bottom rules and end-ticks are the only ruling here,
-     and the section keeps its ordinary `.section` padding.
+  /* No rules in this section at all, and that is now settled. Vertical rules
+     were tried twice — once spanning the whole section, which carried them down
+     alongside the bordered card grid, and once as a ruled lead-in above the
+     header. Then the header itself carried a four-sided ruled band, which is
+     also out. The cards' own hairline frames are the only borders left, and the
+     section keeps its ordinary `.section` padding.
 
      (A JSX comment cannot be the first thing inside `return (` before the root
      element — it parses as an object literal. TS1005.) */
   return (
     <section id="focus" className="section bg-page-alt">
       <div className="container-page">
-        {/* ---- Split header, as a ruled band ----
-            Same device as the Hero's logo strip: horizontals bound the band and
-            vertical end-ticks mark where the content column starts and stops,
-            so the header reads as a region of the ruled sheet rather than
-            floating type above the cards. The ticks are drawn here rather than
-            left to ColumnRules because ColumnRules is lg-only — the band needs
-            its edges at every width. */}
-        <div className="relative border-y border-line">
-          <span aria-hidden className="absolute inset-y-0 left-0 w-px bg-line" />
-          <span aria-hidden className="absolute inset-y-0 right-0 w-px bg-line" />
+        {/* ---- Split header ----
+            This was a ruled band: horizontals top and bottom plus vertical
+            end-ticks, four solid lines boxing the header. Removed on request.
 
-          <div className="grid gap-6 px-6 py-10 lg:grid-cols-12 lg:gap-8 lg:px-10 lg:py-12">
+            The padding went with them. `px-6 lg:px-10` only existed to hold the
+            content off the vertical rules — with the frame gone it became a
+            24/40px indent that pushed the headline inboard of the card grid
+            below, which shares the container's own gutter. The header now
+            starts on the same line as the cards; only the bottom rhythm is
+            kept, so the gap to the grid is unchanged. */}
+        <div className="relative">
+          <div className="grid gap-6 pb-10 lg:grid-cols-12 lg:gap-8 lg:pb-12">
             <motion.h2 {...rise(0)} className="text-h1 text-ink text-balance lg:col-span-5">
               {HEADLINE}
             </motion.h2>

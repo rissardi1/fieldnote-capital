@@ -1501,3 +1501,80 @@ children fit parent, desktop unchanged at 435 / 843 with the divider still at
 **Check to reuse:** comparing a child's width against its parent's catches this;
 comparing `document.scrollWidth` against `clientWidth` does not, because a
 clipping ancestor hides it.
+
+---
+
+## Anchor navigation + `--nav-h` (2026-09-03)
+
+Reported: *"os scrolls dps de clicar nos botões estão muito secos."* Correct —
+every one of the eighteen in-page anchors was a hard cut.
+
+**Cause.** Lenis owns the wheel, and to do that it sets
+`scroll-behavior: auto !important` on the document. That also disables the
+native smooth scroll `html { scroll-behavior: smooth }` would have given an
+`<a href="#faq">`, and nothing was calling `lenis.scrollTo` in its place. The
+old comment in `SmoothScroll.tsx` claimed the override was there so the two
+would not "fight on anchor jumps" — but with no handler, it just guaranteed the
+jump.
+
+**Fix.** One delegated click listener in `components/SmoothScroll.tsx` routes
+same-page anchors through `lenis.scrollTo`, ease-in-out, duration scaled to
+distance and clamped to 0.75–1.5s. Unclamped, a full-page trip took ~4s.
+
+### New token
+
+| Token | Value | Why |
+|---|---|---|
+| `--nav-h` | `64px`, `72px` from `lg` | Height of the sticky header. |
+
+Anchors were landing at `y=0` with the header parked over the first 73px —
+measured on `#faq`, which sat at exactly 0. Two consumers, deliberately not
+sharing the constant:
+
+- `section[id] { scroll-margin-top: calc(var(--nav-h) + 12px) }` for the paths
+  that never reach the handler — a link opened directly at `/#faq`, and
+  reduced motion, where Lenis never starts.
+- `SmoothScroll.tsx` reads the header's **live** box instead of the token, so
+  the JS path cannot drift from the real chrome if the header ever changes.
+
+### Two things the handler has to do beyond easing
+
+- **Move focus.** A native jump moves the focus starting point; a scripted
+  scroll does not, so a keyboard user landed on the FAQ visually and tabbed from
+  the top of the document — and the skip link became decoration. Focus moves on
+  completion with `preventScroll`. Verified: `SECTION#faq`.
+- **Stand down when there are no frames.** A hidden document gets no rAF, so
+  Lenis cannot move and an intercepted click navigates *nowhere* — worse than
+  the hard jump. Observed directly, not theorised: clicking the nav with the
+  preview pane hidden left `scrollY` at 0, hash set, `onComplete` never firing.
+  `if (document.hidden) return` hands the click back to the browser.
+
+### Verified
+
+Synthetic cancelable clicks, 10/10: the four anchors intercepted; ⌘/ctrl/shift/
+middle-click, `mailto:` and an anchor to a missing id all left to the browser.
+`scroll-margin-top` computes to 84px. One sampled run gave 213 distinct scroll
+positions with a 14px largest single-frame step — animated, not a jump.
+
+**Not verified here:** the resting position of a full uninterrupted scroll. The
+preview pane suspends rAF between tool calls, so the sampled run was cut short.
+Confirmed by hand instead.
+
+---
+
+## §5 Focus — the ruled header band removed (2026-09-03)
+
+The header carried a four-sided frame: `border-y` plus two vertical end-ticks.
+All four out on request.
+
+The padding went with them, and that part was not optional. `px-6 lg:px-10`
+existed only to hold the content off the vertical rules; with the frame gone it
+became a 40px indent pushing the headline inboard of the card grid, which sits
+on the container's own gutter. Now `pb-10 lg:pb-12` — bottom rhythm only.
+
+Verified: headline and card 01 both start at x=32, **0px** misalignment.
+
+This closes a question that had been reopened three times. Vertical rules were
+tried spanning the whole section, then as a ruled lead-in, then as this band.
+**§5 has no section ruling. The cards' own hairline frames are the only borders
+in it.**
